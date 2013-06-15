@@ -60,6 +60,16 @@ class Irc(asynchat.async_chat):
     def write(self, str):
         self.write(str.encode('utf-8'))
 
+    def split_n(self, l, n):
+        return (l[i:i + n] for i in range(0, len(l), n))
+
+    def privmsg(self, target, message):
+        message_bytes = message.encode('utf-8')
+        target_bytes = target.encode('utf-8')
+        part_length = 510 - len('PRIVMSG {} '.format(target).encode('utf-8'))
+        for message_part in self.split_n(message_bytes, part_length):
+            self._write(b'PRIVMSG ' + target_bytes + b' ' + message_part)
+
     def collect_incoming_data(self, bytes):
         """
         Overrides async_chat.collect_incoming_data
