@@ -50,7 +50,7 @@ class Irc(asynchat.async_chat):
     def strip_cr_and_lf(self, bytes):
         return bytes.replace(b'\r', b'').replace(b'\n', b'')
 
-    def _write(self, bytes):
+    def _write_raw(self, bytes):
         """
         len(bytes) must be <= 510
         """
@@ -69,7 +69,7 @@ class Irc(asynchat.async_chat):
         target_bytes = target.encode('utf-8')
         part_length = 510 - len('PRIVMSG {} '.format(target).encode('utf-8'))
         for message_part in self.split_n(message_bytes, part_length):
-            self._write(b'PRIVMSG ' + target_bytes + b' ' + message_part)
+            self._write_raw(b'PRIVMSG ' + target_bytes + b' ' + message_part)
 
     def collect_incoming_data(self, bytes):
         """
