@@ -3,6 +3,7 @@ import asyncore
 import logging
 
 from .message import Message
+from .builtin_handlers import handle_ping_pong
 
 class Irc(asynchat.async_chat):
     def __init__(self, host, port, nick, password=None, user=None, realname=None,
@@ -89,7 +90,9 @@ class Irc(asynchat.async_chat):
 
     def _dispatch(self, bytes):
         self.log.debug('read: {}'.format(bytes))
-        self.dispatch(Message(bytes))
+        message = Message(bytes)
+        handle_ping_pong(self, message)
+        self.dispatch(message)
 
     def dispatch(self, message):
         pass
