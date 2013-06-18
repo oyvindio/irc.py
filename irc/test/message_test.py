@@ -24,3 +24,11 @@ class MessageTest(unittest.TestCase):
         self.assertEqual(Message(b':foo!bar@example.com PRIVMSG ' +
                                  b' '.join(parameters)).parameters,
                          [p.decode('utf-8') for p in parameters])
+
+    def test_is_numeric_reply(self):
+        raw = b':foo!bar@example.com 432 ERR_ERRONEUSNICKNAME bogus :Erroneous nickname'
+        self.assertTrue(Message(raw).is_numeric_reply())
+
+    def test_is_not_numeric_reply(self):
+        raw = b'PRIVMSG #chan hi'
+        self.assertFalse(Message(raw).is_numeric_reply())

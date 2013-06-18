@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import re
 
 class Message(object):
     def __init__(self, message_bytes):
@@ -16,3 +17,9 @@ class Message(object):
     @property
     def parameters(self):
         return self._message_parts[2 if self.prefix else 1:]
+
+    def is_numeric_reply(self):
+        return re.match(r'[0-9]{3}', self.command) is not None
+
+    def matches_numeric(self, code, name):
+        return self.command == str(code) and self.parameters[0] == name

@@ -3,10 +3,11 @@ import asyncore
 import logging
 
 from .message import Message
+from .builtin_handlers import handle_nick_err
 from .builtin_handlers import handle_ping_pong
 
 class Irc(asynchat.async_chat):
-    def __init__(self, host, port, nick, password=None, user=None, realname=None,
+    def __init__(self, host, port, nicks, password=None, user=None, realname=None,
                  on_connect=None):
         super().__init__()
         self.set_terminator(b'\n')
@@ -16,9 +17,10 @@ class Irc(asynchat.async_chat):
 
         self.host = host
         self.port = port
-        self.nick = nick
+        self.nick = nicks[0]
+        self.alt_nicks = nicks[1:]
         self.password = password
-        self.user = user if user else nick
+        self.user = user if user else self.nick
         self.realname = realname if realname else ''
         self.on_connect = on_connect
 
@@ -92,6 +94,7 @@ class Irc(asynchat.async_chat):
         self.log.debug('read: {}'.format(bytes))
         message = Message(bytes)
         handle_ping_pong(self, message)
+        handle_nick_err(self, message)
         self.dispatch(message)
 
     def dispatch(self, message):
