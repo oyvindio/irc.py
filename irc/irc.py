@@ -62,7 +62,7 @@ class Irc(asynchat.async_chat):
         self.push(out)
 
     def write(self, str):
-        self.write(str.encode('utf-8'))
+        self._write_raw(str.encode('utf-8'))
 
     def split_n(self, l, n):
         return (l[i:i + n] for i in range(0, len(l), n))
